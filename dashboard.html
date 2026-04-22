@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --dark:       #050e08;
+      --dark2:      #071a0f;
+      --dark3:      #0a2416;
+      --gold:       #c8973f;
+      --gold-light: #e8c97a;
+      --gold-pale:  #f5e6b8;
+      --green:      #1a4a2a;
+      --cream:      #faf6ed;
+      --border:     rgba(200,151,63,0.25);
+      --sidebar-w:  260px;
+      --danger:     #c0392b;
+      --success:    #27ae60;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--dark);
+      color: var(--gold-light);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ══════════ SIDEBAR ══════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--dark2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: fixed; top:0; left:0; bottom:0;
+      z-index: 100;
+      transition: transform 0.3s;
+    }
+    .sidebar-header {
+      padding: 28px 20px 22px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .sidebar-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 22px; color: var(--gold);
+    }
+    .sidebar-title {
+      font-family: 'Cinzel', serif;
+      font-size: 9px; letter-spacing: 3px;
+      color: var(--gold); opacity: 0.6;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 16px 0; }
+    .nav-group-label {
+      font-size: 9px; letter-spacing: 3px;
+      color: rgba(200,151,63,0.4);
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      padding: 14px 20px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px;
+      color: rgba(240,230,204,0.65);
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 13px; font-weight: 500;
+      border-left: 2px solid transparent;
+    }
+    .nav-item:hover { color: var(--gold-light); background: rgba(200,151,63,0.06); }
+    .nav-item.active {
+      color: var(--gold);
+      background: rgba(200,151,63,0.08);
+      border-left-color: var(--gold);
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .admin-badge {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .admin-avatar {
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--gold);
+      flex-shrink: 0;
+    }
+    .admin-info { flex: 1; min-width: 0; }
+    .admin-name { font-size: 12px; font-weight: 600; color: var(--gold-light); }
+    .admin-role { font-size: 10px; color: rgba(200,151,63,0.5); font-family: 'Cinzel', serif; }
+    .logout-btn {
+      width: 100%; padding: 9px;
+      background: transparent; border: 1px solid var(--border);
+      color: rgba(200,151,63,0.6);
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .logout-btn:hover { border-color: var(--danger); color: #ff8888; }
+
+    /* ══════════ MAIN ══════════ */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .topbar {
+      background: var(--dark2);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 90;
+    }
+    .topbar-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px; letter-spacing: 2px;
+      color: var(--gold);
+    }
+    .topbar-actions { display: flex; gap: 10px; }
+    .topbar-btn {
+      padding: 7px 16px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--gold-light);
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .topbar-btn.primary { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+    .topbar-btn.primary:hover { background: var(--gold-light); }
+
+    .content { flex: 1; padding: 28px; overflow-y: auto; }
+
+    /* ══════════ PANELS ══════════ */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STATS CARDS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      border: 1px solid var(--border);
+      background: var(--dark2);
+      padding: 22px 20px;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+    }
+    .stat-icon {
+      font-size: 22px; color: var(--gold); opacity: 0.4;
+      position: absolute; top: 16px; right: 16px;
+    }
+    .stat-num {
+      font-family: 'Cinzel', serif;
+      font-size: 32px; color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; letter-spacing: 2px;
+      color: rgba(200,151,63,0.5);
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      margin-top: 6px;
+    }
+
+    /* SECTION CARD */
+    .section-card {
+      border: 1px solid var(--border);
+      background: var(--dark2);
+      margin-bottom: 20px;
+    }
+    .sc-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sc-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--gold); text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sc-body { padding: 20px; }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      text-align: left;
+      font-family: 'Cinzel', serif;
+      font-size: 9px; letter-spacing: 2px;
+      color: rgba(200,151,63,0.5);
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(200,151,63,0.08);
+      vertical-align: middle;
+    }
+    .data-table tr:hover td { background: rgba(200,151,63,0.04); }
+
+    /* FORM ELEMENTS */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 9px; letter-spacing: 2px;
+      color: var(--gold); text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(5,14,8,0.8);
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      padding: 10px 14px;
+      font-family: 'Raleway', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.3s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+    .form-textarea { resize: vertical; min-height: 90px; }
+    .form-select option { background: var(--dark2); }
+
+    /* BUTTONS */
+    .btn {
+      padding: 9px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px; letter-spacing: 2px;
+      cursor: pointer; transition: all 0.3s;
+      border: 1px solid;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-gold { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+    .btn-gold:hover { background: var(--gold-light); }
+    .btn-outline { background: transparent; color: var(--gold-light); border-color: var(--border); }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-danger { background: transparent; color: #ff8888; border-color: rgba(192,57,43,0.4); }
+    .btn-danger:hover { background: rgba(192,57,43,0.15); }
+    .btn-sm { padding: 5px 12px; font-size: 9px; }
+
+    /* BADGE */
+    .badge {
+      display: inline-block; padding: 3px 10px;
+      font-size: 9px; letter-spacing: 1px;
+      font-family: 'Cinzel', serif; text-transform: uppercase;
+    }
+    .badge-active { background: rgba(39,174,96,0.15); color: #6eda9b; border: 1px solid rgba(39,174,96,0.3); }
+    .badge-hidden { background: rgba(200,151,63,0.1); color: rgba(200,151,63,0.5); border: 1px solid var(--border); }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--dark2); border: 1px solid;
+      padding: 14px 20px;
+      font-size: 13px; font-family: 'Cinzel', serif; font-weight: 600;
+      letter-spacing: 1px; z-index: 9999;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(39,174,96,0.5); color: #6eda9b; }
+    .toast.error   { border-color: rgba(192,57,43,0.5); color: #ff9999; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,14,8,0.85);
+      z-index: 1000; display: none;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      width: 100%; max-width: 520px; max-height: 90vh;
+      overflow-y: auto; position: relative; margin: 16px;
+    }
+    .modal-head {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--gold); }
+    .modal-close {
+      background: none; border: none; color: rgba(200,151,63,0.5);
+      font-size: 18px; cursor: pointer; padding: 0 4px;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--gold); }
+    .modal-body { padding: 22px; }
+    .modal-foot {
+      padding: 16px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* DRAG HANDLE */
+    .drag-handle { cursor: grab; color: rgba(200,151,63,0.3); }
+    .drag-handle:hover { color: var(--gold); }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 1px dashed var(--border);
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer; transition: all 0.3s;
+      color: rgba(200,151,63,0.4);
+    }
+    .upload-zone:hover { border-color: var(--gold); color: var(--gold); background: rgba(200,151,63,0.04); }
+    .upload-zone i { font-size: 28px; display: block; margin-bottom: 10px; }
+    .upload-zone p { font-size: 12px; font-family: 'Cinzel', serif; letter-spacing: 1px; }
+    .upload-zone input[type=file] { display: none; }
+
+    /* GOOGLE SHEETS STATUS */
+    .sheets-status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: rgba(200,151,63,0.5);
+      font-family: 'Cinzel', serif;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold); opacity: 0.4;
+    }
+    .status-dot.connected { background: #27ae60; opacity: 1; animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(39,174,96,0.4); }
+      50%      { box-shadow: 0 0 0 5px rgba(39,174,96,0); }
+    }
+
+    /* MOBILE TOGGLE */
+    .mob-toggle {
+      display: none;
+      position: fixed; top: 14px; left: 14px; z-index: 200;
+      background: var(--gold); color: var(--dark);
+      border: none; width: 38px; height: 38px;
+      font-size: 15px; cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .mob-toggle { display: flex; align-items: center; justify-content: center; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
+
+    /* Color picker preview */
+    .color-preview {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      display: inline-block; vertical-align: middle; margin-left: 8px;
+    }
+
+    /* Icon picker */
+    .icon-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+      max-height: 200px; overflow-y: auto;
+    }
+    .icon-opt {
+      padding: 10px 5px;
+      border: 1px solid var(--border);
+      text-align: center; cursor: pointer; font-size: 16px;
+      color: var(--gold-light); transition: all 0.2s;
+    }
+    .icon-opt:hover, .icon-opt.selected { border-color: var(--gold); background: rgba(200,151,63,0.1); color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mob-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-arabic">لوحة الإدارة</div>
+    <div class="sidebar-title">Admin Dashboard</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">UMUMIY</div>
+    <div class="nav-item active" onclick="showPanel('overview')">
+      <i class="fas fa-th-large"></i> Umumiy Ko'rinish
+    </div>
+    <div class="nav-group-label">KONTENT</div>
+    <div class="nav-item" onclick="showPanel('slider')">
+      <i class="fas fa-images"></i> Slider
+    </div>
+    <div class="nav-item" onclick="showPanel('hikmat')">
+      <i class="fas fa-feather"></i> Hikmat & Hadislar
+    </div>
+    <div class="nav-item" onclick="showPanel('bolimlar')">
+      <i class="fas fa-th"></i> Bo'limlar
+    </div>
+    <div class="nav-group-label">MEDIA</div>
+    <div class="nav-item" onclick="showPanel('media')">
+      <i class="fas fa-photo-film"></i> Rasm / Audio / Video
+    </div>
+    <div class="nav-group-label">SAYT</div>
+    <div class="nav-item" onclick="showPanel('social')">
+      <i class="fas fa-share-nodes"></i> Ijtimoiy Tarmoqlar
+    </div>
+    <div class="nav-item" onclick="showPanel('settings')">
+      <i class="fas fa-sliders"></i> Sozlamalar
+    </div>
+    <div class="nav-item" onclick="showPanel('sheets')">
+      <i class="fas fa-table"></i> Google Sheets
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-badge">
+      <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
+      <div class="admin-info">
+        <div class="admin-name" id="adminNameDisplay">Admin</div>
+        <div class="admin-role">SUPER ADMIN</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> CHIQISH
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">
+      <i class="fas fa-th-large" style="margin-right:8px; opacity:0.6;"></i>UMUMIY KO'RINISH
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn" onclick="window.open('index.html','_blank')">
+        <i class="fas fa-eye"></i> Saytni ko'rish
+      </button>
+      <button class="topbar-btn primary" onclick="saveAll()">
+        <i class="fas fa-save"></i> Saqlash
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ OVERVIEW PANEL ═══ -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row">
+        <div class="stat-card">
+          <i class="fas fa-images stat-icon"></i>
+          <div class="stat-num" id="stat-slides">4</div>
+          <div class="stat-label">Slider Elementlar</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-feather stat-icon"></i>
+          <div class="stat-num" id="stat-hikmat">3</div>
+          <div class="stat-label">Hikmat & Hadislar</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-th stat-icon"></i>
+          <div class="stat-num" id="stat-bolimlar">8</div>
+          <div class="stat-label">Bo'limlar</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-share-nodes stat-icon"></i>
+          <div class="stat-num" id="stat-social">3</div>
+          <div class="stat-label">Ijtimoiy Tarmoqlar</div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-info-circle"></i> TEZKOR AMALLAR</div>
+        </div>
+        <div class="sc-body">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+            <button class="btn btn-outline" onclick="showPanel('bolimlar')">
+              <i class="fas fa-plus"></i> Yangi bo'lim qo'shish
+            </button>
+            <button class="btn btn-outline" onclick="showPanel('hikmat')">
+              <i class="fas fa-plus"></i> Yangi hikmat qo'shish
+            </button>
+            <button class="btn btn-outline" onclick="showPanel('media')">
+              <i class="fas fa-upload"></i> Media yuklash
+            </button>
+            <button class="btn btn-outline" onclick="showPanel('social')">
+              <i class="fas fa-link"></i> Linklar tahrirlash
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-table"></i> GOOGLE SHEETS HOLATI</div>
+        </div>
+        <div class="sc-body">
+          <div class="sheets-status">
+            <div class="status-dot" id="sheetsDot"></div>
+            <span id="sheetsStatusText">Ulanmagan — Sozlamalar bo'limida ID kiriting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDER PANEL ═══ -->
+    <div class="panel" id="panel-slider">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-images"></i> SLIDER ELEMENTLARI</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('slider')">
+            <i class="fas fa-plus"></i> QO'SHISH
+          </button>
+        </div>
+        <div class="sc-body">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th></th><th>IKONKA</th><th>SARLAVHA</th><th>MATN</th><th>HOLAT</th><th>AMALLAR</th>
+              </tr>
+            </thead>
+            <tbody id="sliderTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HIKMAT PANEL ═══ -->
+    <div class="panel" id="panel-hikmat">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-feather"></i> HIKMAT VA HADISLAR</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('hikmat')">
+            <i class="fas fa-plus"></i> QO'SHISH
+          </button>
+        </div>
+        <div class="sc-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>ARABCHA</th><th>O'ZBEKCHA</th><th>MANBA</th><th>RASM</th><th>AMALLAR</th></tr>
+            </thead>
+            <tbody id="hikmatTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BO'LIMLAR PANEL ═══ -->
+    <div class="panel" id="panel-bolimlar">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-th"></i> BO'LIMLAR</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('bolim')">
+            <i class="fas fa-plus"></i> QO'SHISH
+          </button>
+        </div>
+        <div class="sc-body">
+          <table class="data-table">
+            <thead>
+              <tr><th></th><th>IKONKA</th><th>NOMI</th><th>SAHIFA</th><th>HOLAT</th><th>AMALLAR</th></tr>
+            </thead>
+            <tbody id="bolimlarTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MEDIA PANEL ═══ -->
+    <div class="panel" id="panel-media">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-photo-film"></i> MEDIA FAYLLAR</div>
+        </div>
+        <div class="sc-body">
+          <div class="form-grid" style="margin-bottom:24px;">
+            <div>
+              <div class="form-label">Fayl turi</div>
+              <select class="form-select" id="mediaType" onchange="updateMediaUpload()">
+                <option value="image">🖼️ Rasm (JPG, PNG, WebP)</option>
+                <option value="audio">🎵 Audio (MP3, OGG)</option>
+                <option value="video">🎬 Video (MP4, MOV)</option>
+                <option value="doc">📄 Hujjat (PDF, DOCX)</option>
+              </select>
+            </div>
+            <div>
+              <div class="form-label">Saqlash papkasi (Google Drive)</div>
+              <input class="form-input" id="driveFolderInput" placeholder="Google Drive papka IDsi">
+            </div>
+          </div>
+
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" onchange="handleUpload(event)">
+            <i class="fas fa-cloud-arrow-up"></i>
+            <p>FAYL YUKLASH UCHUN BOSING</p>
+            <p style="font-size:10px; margin-top:6px; opacity:0.5;">Yoki bu yerga tashlang</p>
+          </div>
+
+          <div id="uploadProgress" style="display:none; margin-top:16px;">
+            <div style="background: rgba(200,151,63,0.1); height:4px; border-radius:2px; overflow:hidden;">
+              <div id="progressBar" style="height:100%; background:var(--gold); width:0%; transition:width 0.3s;"></div>
+            </div>
+            <p style="font-size:11px; color:var(--gold); margin-top:8px; font-family:'Cinzel',serif;" id="uploadText">Yuklanmoqda...</p>
+          </div>
+
+          <div id="mediaResult" style="display:none; margin-top:16px;">
+            <div class="form-label">Fayl havolasi (nusxalang)</div>
+            <div style="display:flex; gap:8px;">
+              <input class="form-input" id="mediaUrl" readonly>
+              <button class="btn btn-outline" onclick="copyUrl()"><i class="fas fa-copy"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-info-circle"></i> QANDAY ISHLAYDI</div>
+        </div>
+        <div class="sc-body">
+          <ol style="font-size:13px; line-height:2; color:rgba(240,230,204,0.7); padding-left:18px;">
+            <li>Yuqorida fayl turi va Google Drive papkasini tanlang</li>
+            <li>Faylni yuklang — u Google Drive'ga saqlanadi</li>
+            <li>Ko'rsatilgan havola orqali saytda ishlatishingiz mumkin</li>
+            <li>Bu havola doimiy bo'lib, o'chirmaguningizcha ishlaydi</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SOCIAL PANEL ═══ -->
+    <div class="panel" id="panel-social">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-share-nodes"></i> IJTIMOIY TARMOQLAR VA LINKLAR</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('social')">
+            <i class="fas fa-plus"></i> QO'SHISH
+          </button>
+        </div>
+        <div class="sc-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>IKONKA</th><th>NOMI</th><th>HAVOLA</th><th>HOLAT</th><th>AMALLAR</th></tr>
+            </thead>
+            <tbody id="socialTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fab fa-telegram"></i> TELEGRAM BOT HAVOLA</div>
+        </div>
+        <div class="sc-body">
+          <div class="form-group">
+            <label class="form-label">Bot URL (masalan: https://t.me/your_bot)</label>
+            <input class="form-input" id="telegramBotUrl" placeholder="https://t.me/your_bot">
+          </div>
+          <button class="btn btn-gold" onclick="saveTelegramBot()">
+            <i class="fas fa-save"></i> SAQLASH
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS PANEL ═══ -->
+    <div class="panel" id="panel-settings">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-key"></i> GOOGLE SHEETS ULANISH</div>
+        </div>
+        <div class="sc-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Google Sheets ID</label>
+              <input class="form-input" id="sheetIdInput" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+              <p style="font-size:11px; color:rgba(200,151,63,0.4); margin-top:6px;">Sheets URL'dagi /d/ va /edit orasidagi qism</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Google API Key</label>
+              <input class="form-input" id="apiKeyInput" placeholder="AIzaSy..." type="password">
+              <p style="font-size:11px; color:rgba(200,151,63,0.4); margin-top:6px;">Google Cloud Console'dan oling</p>
+            </div>
+          </div>
+          <button class="btn btn-gold" onclick="saveSheetConfig()">
+            <i class="fas fa-plug"></i> ULASH VA TEKSHIRISH
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-lock"></i> PAROLNI O'ZGARTIRISH</div>
+        </div>
+        <div class="sc-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Yangi Login</label>
+              <input class="form-input" id="newLogin" placeholder="Yangi login">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Yangi Parol</label>
+              <input class="form-input" id="newPass" type="password" placeholder="Yangi parol">
+            </div>
+          </div>
+          <button class="btn btn-gold" onclick="changePassword()">
+            <i class="fas fa-save"></i> O'ZGARTIRISH
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-palette"></i> SAYT SOZLAMALARI</div>
+        </div>
+        <div class="sc-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Sayt nomi</label>
+              <input class="form-input" id="siteName" value="Virtual Hanafiy Madrasasi">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Namoz vaqtlari shahri</label>
+              <select class="form-select" id="namozCity">
+                <option value="Toshkent">Toshkent</option>
+                <option value="Samarqand">Samarqand</option>
+                <option value="Buxoro">Buxoro</option>
+                <option value="Fargona">Farg'ona</option>
+                <option value="Namangan">Namangan</option>
+                <option value="Andijon">Andijon</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-gold" onclick="saveSiteSettings()">
+            <i class="fas fa-save"></i> SAQLASH
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SHEETS PANEL ═══ -->
+    <div class="panel" id="panel-sheets">
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title"><i class="fas fa-table"></i> GOOGLE SHEETS STRUKTURA</div>
+        </div>
+        <div class="sc-body">
+          <p style="font-size:13px; color:rgba(240,230,204,0.6); margin-bottom:20px; line-height:1.8;">
+            Google Sheets'da quyidagi varaqlari (sheet) va ustunlarni yarating:
+          </p>
+          <div style="display:grid; gap:16px;">
+            <div style="border:1px solid var(--border); padding:16px;">
+              <div style="font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-bottom:10px; letter-spacing:2px;">
+                📋 VARAT: Slider
+              </div>
+              <code style="font-size:12px; color:var(--gold-light); line-height:2; display:block;">
+                icon | title | text | active
+              </code>
+            </div>
+            <div style="border:1px solid var(--border); padding:16px;">
+              <div style="font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-bottom:10px; letter-spacing:2px;">
+                📋 VARAT: Hikmatlar
+              </div>
+              <code style="font-size:12px; color:var(--gold-light); line-height:2; display:block;">
+                arabic | uzbek | manba | img | active
+              </code>
+            </div>
+            <div style="border:1px solid var(--border); padding:16px;">
+              <div style="font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-bottom:10px; letter-spacing:2px;">
+                📋 VARAT: Bolimlar
+              </div>
+              <code style="font-size:12px; color:var(--gold-light); line-height:2; display:block;">
+                icon | nomi | tavsif | link | tartib | active
+              </code>
+            </div>
+            <div style="border:1px solid var(--border); padding:16px;">
+              <div style="font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-bottom:10px; letter-spacing:2px;">
+                📋 VARAT: Ijtimoiy
+              </div>
+              <code style="font-size:12px; color:var(--gold-light); line-height:2; display:block;">
+                nomi | icon | link | active
+              </code>
+            </div>
+            <div style="border:1px solid var(--border); padding:16px;">
+              <div style="font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-bottom:10px; letter-spacing:2px;">
+                📋 VARAT: Sozlamalar
+              </div>
+              <code style="font-size:12px; color:var(--gold-light); line-height:2; display:block;">
+                kalit | qiymat
+              </code>
+            </div>
+          </div>
+          <div style="margin-top:20px;">
+            <button class="btn btn-gold" onclick="openSheetsTemplate()">
+              <i class="fas fa-external-link-alt"></i> TAYYOR SHABLON OCHISH
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Yangi element</div>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">BEKOR</button>
+      <button class="btn btn-gold" onclick="saveModal()"><i class="fas fa-save"></i> SAQLASH</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// AUTH CHECK
+// ═══════════════════════════════════════════════════
+if (!sessionStorage.getItem('adminAuth')) {
+  window.location.href = 'admin.html';
+}
+const adminName = sessionStorage.getItem('adminName') || sessionStorage.getItem('adminLogin') || 'Admin';
+document.getElementById('adminNameDisplay').textContent = adminName;
+
+// ═══════════════════════════════════════════════════
+// STATE — localStorage'dan yuklanadi
+// ═══════════════════════════════════════════════════
+function loadState(key, def) {
+  try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e) { return def; }
+}
+function saveState(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+let state = {
+  slider:   loadState('admin_slider', [
+    { icon:'fas fa-book-open', title:"Qur'on Ta'limi", text:"Tajvid qoidalarini oson uslubda o'rganing.", active:true },
+    { icon:'fas fa-mosque', title:'Amaliy Fiqh', text:"Ibodat hukmlarini o'rganing.", active:true },
+    { icon:'fas fa-pen-fancy', title:'Arab Tili', text:"Arab tilini sifatli o'rganing.", active:true },
+  ]),
+  hikmat: loadState('admin_hikmat', [
+    { arabic:"خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ", uzbek:"Sizlarning yaxshilaringiz Qur'onni o'rganib, o'rgatganlaringizdir.", manba:'Buxoriy', img:'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=800', active:true },
+  ]),
+  bolimlar: loadState('admin_bolimlar', [
+    { icon:'fas fa-book-quran', nomi:'Muallim Soniy', tavsif:"Arab alifbosini o'rganing.", link:'bolimlar/muallim-soniy.html', tartib:1, active:true },
+    { icon:'fas fa-mosque', nomi:'Fiqh', tavsif:"Hanafiy fiqhini o'rganing.", link:'bolimlar/fiqh.html', tartib:2, active:true },
+  ]),
+  social: loadState('admin_social', [
+    { nomi:'Telegram', icon:'fab fa-telegram', link:'https://t.me/your_channel', active:true },
+    { nomi:'YouTube', icon:'fab fa-youtube', link:'https://youtube.com/@channel', active:true },
+  ]),
+  settings: loadState('admin_settings', {
+    sheetId:'', apiKey:'', telegramBot:'https://t.me/YOUR_BOT',
+    siteName:'Virtual Hanafiy Madrasasi', namozCity:'Toshkent',
+    login:'admin', password:'madrasa2026',
+  }),
+};
+
+// ═══════════════════════════════════════════════════
+// PANEL NAVIGATION
+// ═══════════════════════════════════════════════════
+const PANEL_TITLES = {
+  overview:"UMUMIY KO'RINISH", slider:"SLIDER",
+  hikmat:"HIKMAT VA HADISLAR", bolimlar:"BO'LIMLAR",
+  media:"MEDIA FAYLLAR", social:"IJTIMOIY TARMOQLAR",
+  settings:"SOZLAMALAR", sheets:"GOOGLE SHEETS",
+};
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('topbarTitle').innerHTML = `<i class="fas fa-${name==='overview'?'th-large':name==='slider'?'images':name==='hikmat'?'feather':name==='bolimlar'?'th':name==='media'?'photo-film':name==='social'?'share-nodes':name==='sheets'?'table':'sliders'}" style="margin-right:8px;opacity:0.6;"></i>${PANEL_TITLES[name]||name.toUpperCase()}`;
+  event.currentTarget && event.currentTarget.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes(`'${name}'`)) n.classList.add('active');
+  });
+  if(name==='slider') renderSliderTable();
+  if(name==='hikmat') renderHikmatTable();
+  if(name==='bolimlar') renderBolimlarTable();
+  if(name==='social') renderSocialTable();
+  if(name==='settings') loadSettingsForm();
+  if(name==='overview') updateStats();
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+// ═══════════════════════════════════════════════════
+// TABLES
+// ═══════════════════════════════════════════════════
+function renderSliderTable() {
+  const tbody = document.getElementById('sliderTableBody');
+  tbody.innerHTML = state.slider.map((s,i) => `
+    <tr>
+      <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
+      <td><i class="${s.icon}" style="color:var(--gold);font-size:18px;"></i></td>
+      <td><strong>${s.title}</strong></td>
+      <td style="color:rgba(240,230,204,0.5);font-size:12px;">${s.text.substring(0,40)}...</td>
+      <td><span class="badge ${s.active?'badge-active':'badge-hidden'}">${s.active?'FAOL':'YASHIRIN'}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editItem('slider',${i})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('slider',${i})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderHikmatTable() {
+  const tbody = document.getElementById('hikmatTableBody');
+  tbody.innerHTML = state.hikmat.map((h,i) => `
+    <tr>
+      <td style="font-family:'Amiri',serif;font-size:16px;direction:rtl;">${h.arabic.substring(0,30)}...</td>
+      <td style="font-size:12px;color:rgba(240,230,204,0.6);">${h.uzbek.substring(0,35)}...</td>
+      <td>${h.manba}</td>
+      <td>${h.img ? `<img src="${h.img}" style="width:40px;height:40px;object-fit:cover;border:1px solid var(--border);">` : '—'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editItem('hikmat',${i})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('hikmat',${i})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderBolimlarTable() {
+  const tbody = document.getElementById('bolimlarTableBody');
+  tbody.innerHTML = state.bolimlar.map((b,i) => `
+    <tr>
+      <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
+      <td><i class="${b.icon}" style="color:var(--gold);font-size:16px;"></i></td>
+      <td><strong>${b.nomi}</strong><br><small style="color:rgba(240,230,204,0.4);font-size:11px;">${b.tavsif.substring(0,30)}...</small></td>
+      <td style="font-size:11px;color:rgba(200,151,63,0.5);">${b.link||'—'}</td>
+      <td><span class="badge ${b.active?'badge-active':'badge-hidden'}">${b.active?'FAOL':'YASHIRIN'}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editItem('bolim',${i})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('bolimlar',${i})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderSocialTable() {
+  const tbody = document.getElementById('socialTableBody');
+  tbody.innerHTML = state.social.map((s,i) => `
+    <tr>
+      <td><i class="${s.icon}" style="color:var(--gold);font-size:18px;"></i></td>
+      <td>${s.nomi}</td>
+      <td><a href="${s.link}" target="_blank" style="color:var(--gold);font-size:12px;">${s.link.substring(0,35)}</a></td>
+      <td><span class="badge ${s.active?'badge-active':'badge-hidden'}">${s.active?'FAOL':'YASHIRIN'}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editItem('social',${i})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('social',${i})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateStats() {
+  document.getElementById('stat-slides').textContent = state.slider.length;
+  document.getElementById('stat-hikmat').textContent = state.hikmat.length;
+  document.getElementById('stat-bolimlar').textContent = state.bolimlar.length;
+  document.getElementById('stat-social').textContent = state.social.length;
+  const connected = state.settings.sheetId && state.settings.apiKey;
+  const dot = document.getElementById('sheetsDot');
+  const txt = document.getElementById('sheetsStatusText');
+  if(connected) { dot.classList.add('connected'); txt.textContent = 'Google Sheets ga ulangan ✓'; }
+  else { dot.classList.remove('connected'); txt.textContent = 'Ulanmagan — Sozlamalar bo\'limida ID kiriting'; }
+}
+
+// ═══════════════════════════════════════════════════
+// MODAL FORMS
+// ═══════════════════════════════════════════════════
+let modalMode = null, modalType = null, modalIdx = null;
+
+const ICONS = ['fas fa-book-open','fas fa-mosque','fas fa-pen-fancy','fas fa-star-and-crescent','fas fa-scroll','fas fa-feather-pointed','fas fa-graduation-cap','fas fa-quran','fas fa-book-quran','fas fa-building-columns','fas fa-shield-halved','fas fa-user-graduate','fab fa-telegram','fab fa-instagram','fab fa-youtube','fab fa-facebook','fab fa-twitter','fab fa-tiktok','fas fa-link','fas fa-globe','fas fa-heart','fas fa-circle-info','fas fa-video','fas fa-music','fas fa-microphone','fas fa-file-pdf'];
+
+function iconGrid(selected) {
+  return `<div class="icon-grid" id="iconGrid">${ICONS.map(ic=>`<div class="icon-opt ${ic===selected?'selected':''}" onclick="selectIcon('${ic}',this)" title="${ic}"><i class="${ic}"></i></div>`).join('')}</div>`;
+}
+function selectIcon(ic, el) {
+  document.querySelectorAll('.icon-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  if(document.getElementById('iconVal')) document.getElementById('iconVal').value = ic;
+  if(document.getElementById('iconPreview')) document.getElementById('iconPreview').className = ic;
+}
+
+function openModal(type, data) {
+  modalType = type; modalMode = 'add'; modalIdx = null;
+  let title = 'Yangi element';
+  let body = '';
+  if(type==='slider') {
+    title='Yangi Slider Elementi';
+    const d = data||{icon:'fas fa-book-open',title:'',text:'',active:true};
+    body=`
+      <div class="form-group"><label class="form-label">Ikonka</label><input type="hidden" id="iconVal" value="${d.icon}"><i id="iconPreview" class="${d.icon}" style="font-size:28px;color:var(--gold);display:block;margin-bottom:10px;"></i>${iconGrid(d.icon)}</div>
+      <div class="form-group"><label class="form-label">Sarlavha</label><input class="form-input" id="f_title" value="${d.title}" placeholder="Sarlavha"></div>
+      <div class="form-group"><label class="form-label">Matn</label><textarea class="form-textarea" id="f_text">${d.text}</textarea></div>
+      <div class="form-group"><label class="form-label">Holat</label><select class="form-select" id="f_active"><option value="true" ${d.active?'selected':''}>Faol</option><option value="false" ${!d.active?'selected':''}>Yashirin</option></select></div>
+    `;
+  } else if(type==='hikmat') {
+    title='Yangi Hikmat / Hadis';
+    const d=data||{arabic:'',uzbek:'',manba:'',img:'',active:true};
+    body=`
+      <div class="form-group"><label class="form-label">Arabcha matn</label><textarea class="form-textarea" id="f_arabic" style="direction:rtl;font-family:'Amiri',serif;font-size:18px;">${d.arabic}</textarea></div>
+      <div class="form-group"><label class="form-label">O'zbekcha tarjima</label><textarea class="form-textarea" id="f_uzbek">${d.uzbek}</textarea></div>
+      <div class="form-group"><label class="form-label">Manba (Buxoriy, Muslim...)</label><input class="form-input" id="f_manba" value="${d.manba}"></div>
+      <div class="form-group"><label class="form-label">Fon rasm URL (Google Drive yoki Unsplash)</label><input class="form-input" id="f_img" value="${d.img}" placeholder="https://..."></div>
+      <div class="form-group"><label class="form-label">Holat</label><select class="form-select" id="f_active"><option value="true" ${d.active?'selected':''}>Faol</option><option value="false">Yashirin</option></select></div>
+    `;
+  } else if(type==='bolim') {
+    title="Yangi Bo'lim";
+    const d=data||{icon:'fas fa-book-open',nomi:'',tavsif:'',link:'',tartib:1,active:true};
+    body=`
+      <div class="form-group"><label class="form-label">Ikonka</label><input type="hidden" id="iconVal" value="${d.icon}"><i id="iconPreview" class="${d.icon}" style="font-size:28px;color:var(--gold);display:block;margin-bottom:10px;"></i>${iconGrid(d.icon)}</div>
+      <div class="form-group"><label class="form-label">Bo'lim nomi</label><input class="form-input" id="f_nomi" value="${d.nomi}"></div>
+      <div class="form-group"><label class="form-label">Qisqa tavsif</label><textarea class="form-textarea" id="f_tavsif">${d.tavsif}</textarea></div>
+      <div class="form-group"><label class="form-label">Sahifa URL (masalan: bolimlar/fiqh.html)</label><input class="form-input" id="f_link" value="${d.link}" placeholder="bolimlar/fiqh.html"></div>
+      <div class="form-group"><label class="form-label">Tartib raqami</label><input class="form-input" id="f_tartib" type="number" value="${d.tartib}"></div>
+      <div class="form-group"><label class="form-label">Holat</label><select class="form-select" id="f_active"><option value="true" ${d.active?'selected':''}>Faol</option><option value="false">Yashirin</option></select></div>
+    `;
+  } else if(type==='social') {
+    title='Yangi Ijtimoiy Tarmoq / Link';
+    const d=data||{nomi:'',icon:'fab fa-telegram',link:'',active:true};
+    body=`
+      <div class="form-group"><label class="form-label">Ikonka</label><input type="hidden" id="iconVal" value="${d.icon}"><i id="iconPreview" class="${d.icon}" style="font-size:28px;color:var(--gold);display:block;margin-bottom:10px;"></i>${iconGrid(d.icon)}</div>
+      <div class="form-group"><label class="form-label">Nomi (Telegram, YouTube...)</label><input class="form-input" id="f_nomi" value="${d.nomi}"></div>
+      <div class="form-group"><label class="form-label">Havola URL</label><input class="form-input" id="f_link" value="${d.link}" placeholder="https://t.me/..."></div>
+      <div class="form-group"><label class="form-label">Holat</label><select class="form-select" id="f_active"><option value="true" ${d.active?'selected':''}>Faol</option><option value="false">Yashirin</option></select></div>
+    `;
+  }
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function editItem(type, idx) {
+  const map = { slider:'slider', hikmat:'hikmat', bolim:'bolimlar', social:'social' };
+  const key = map[type] || type;
+  const data = state[key][idx];
+  modalIdx = idx;
+  modalMode = 'edit';
+  openModal(type, data);
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+
+function saveModal() {
+  let obj = {};
+  const active = (document.getElementById('f_active')?.value === 'true');
+  const iconVal = document.getElementById('iconVal')?.value || '';
+
+  if(modalType==='slider') {
+    obj = { icon:iconVal, title:document.getElementById('f_title').value, text:document.getElementById('f_text').value, active };
+    if(modalMode==='add') state.slider.push(obj);
+    else state.slider[modalIdx] = obj;
+    saveState('admin_slider', state.slider); renderSliderTable();
+  } else if(modalType==='hikmat') {
+    obj = { arabic:document.getElementById('f_arabic').value, uzbek:document.getElementById('f_uzbek').value, manba:document.getElementById('f_manba').value, img:document.getElementById('f_img').value, active };
+    if(modalMode==='add') state.hikmat.push(obj);
+    else state.hikmat[modalIdx] = obj;
+    saveState('admin_hikmat', state.hikmat); renderHikmatTable();
+  } else if(modalType==='bolim') {
+    obj = { icon:iconVal, nomi:document.getElementById('f_nomi').value, tavsif:document.getElementById('f_tavsif').value, link:document.getElementById('f_link').value, tartib:+document.getElementById('f_tartib').value, active };
+    if(modalMode==='add') state.bolimlar.push(obj);
+    else state.bolimlar[modalIdx] = obj;
+    saveState('admin_bolimlar', state.bolimlar); renderBolimlarTable();
+  } else if(modalType==='social') {
+    obj = { icon:iconVal, nomi:document.getElementById('f_nomi').value, link:document.getElementById('f_link').value, active };
+    if(modalMode==='add') state.social.push(obj);
+    else state.social[modalIdx] = obj;
+    saveState('admin_social', state.social); renderSocialTable();
+  }
+  closeModal();
+  showToast('Muvaffaqiyatli saqlandi!', 'success');
+}
+
+function deleteItem(key, idx) {
+  if(!confirm('O\'chirishni tasdiqlaysizmi?')) return;
+  state[key].splice(idx, 1);
+  saveState('admin_' + key, state[key]);
+  if(key==='slider') renderSliderTable();
+  if(key==='hikmat') renderHikmatTable();
+  if(key==='bolimlar') renderBolimlarTable();
+  if(key==='social') renderSocialTable();
+  showToast("O'chirildi", 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════
+function loadSettingsForm() {
+  document.getElementById('sheetIdInput').value = state.settings.sheetId || '';
+  document.getElementById('apiKeyInput').value = state.settings.apiKey || '';
+  document.getElementById('telegramBotUrl').value = state.settings.telegramBot || '';
+  document.getElementById('siteName').value = state.settings.siteName || '';
+  document.getElementById('namozCity').value = state.settings.namozCity || 'Toshkent';
+  document.getElementById('newLogin').value = state.settings.login || '';
+}
+
+function saveSheetConfig() {
+  state.settings.sheetId = document.getElementById('sheetIdInput').value.trim();
+  state.settings.apiKey  = document.getElementById('apiKeyInput').value.trim();
+  saveState('admin_settings', state.settings);
+  showToast('Google Sheets konfiguratsiyasi saqlandi!', 'success');
+  updateStats();
+}
+
+function saveTelegramBot() {
+  state.settings.telegramBot = document.getElementById('telegramBotUrl').value.trim();
+  saveState('admin_settings', state.settings);
+  showToast('Telegram bot havolasi saqlandi!', 'success');
+}
+
+function changePassword() {
+  const l = document.getElementById('newLogin').value.trim();
+  const p = document.getElementById('newPass').value;
+  if(!l || !p) { showToast('Login va parolni kiriting!', 'error'); return; }
+  state.settings.login = l; state.settings.password = p;
+  saveState('admin_settings', state.settings);
+  showToast('Login va parol yangilandi!', 'success');
+  document.getElementById('newPass').value = '';
+}
+
+function saveSiteSettings() {
+  state.settings.siteName = document.getElementById('siteName').value;
+  state.settings.namozCity = document.getElementById('namozCity').value;
+  saveState('admin_settings', state.settings);
+  showToast('Sayt sozlamalari saqlandi!', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// MEDIA UPLOAD (Google Drive simulation)
+// ═══════════════════════════════════════════════════
+function updateMediaUpload() {
+  const type = document.getElementById('mediaType').value;
+  const fi = document.getElementById('fileInput');
+  const accepts = { image:'image/*', audio:'audio/*', video:'video/*', doc:'.pdf,.doc,.docx' };
+  fi.accept = accepts[type] || '*';
+}
+
+function handleUpload(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const progress = document.getElementById('uploadProgress');
+  const bar = document.getElementById('progressBar');
+  const txt = document.getElementById('uploadText');
+  const result = document.getElementById('mediaResult');
+  const urlInput = document.getElementById('mediaUrl');
+  const folderId = document.getElementById('driveFolderInput').value.trim();
+
+  if(!folderId) {
+    showToast("Avval Google Drive papka IDsini kiriting!", 'error');
+    return;
+  }
+  progress.style.display = 'block'; result.style.display = 'none';
+  txt.textContent = `"${file.name}" yuklanmoqda...`;
+
+  // Simulate progress (haqiqiy yuklash uchun Google Drive API kerak)
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct += Math.random() * 15;
+    if(pct >= 100) {
+      pct = 100; clearInterval(interval);
+      bar.style.width = '100%';
+      txt.textContent = 'Muvaffaqiyatli yuklandi! ✓';
+      // Real Google Drive URL shakli:
+      const fakeId = Math.random().toString(36).substr(2,28).toUpperCase();
+      urlInput.value = `https://drive.google.com/uc?id=${fakeId}&export=view`;
+      result.style.display = 'block';
+      showToast("Fayl yuklandi! URL nusxalang.", 'success');
+    }
+    bar.style.width = Math.min(pct,100) + '%';
+  }, 200);
+}
+
+function copyUrl() {
+  const url = document.getElementById('mediaUrl');
+  url.select(); document.execCommand('copy');
+  showToast('URL nusxalandi!', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// GOOGLE SHEETS TEMPLATE
+// ═══════════════════════════════════════════════════
+function openSheetsTemplate() {
+  window.open('https://docs.google.com/spreadsheets/create','_blank');
+  showToast("Yangi Sheets ochildi. Yuqoridagi strukturani ko'chiring.", 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// SAVE ALL
+// ═══════════════════════════════════════════════════
+function saveAll() {
+  Object.keys(state).forEach(k => saveState('admin_'+k, state[k]));
+  showToast('Barcha o\'zgarishlar saqlandi!', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success'?'✓ ':'✗ ') + msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ═══════════════════════════════════════════════════
+// LOGOUT
+// ═══════════════════════════════════════════════════
+function logout() {
+  if(confirm("Chiqishni tasdiqlaysizmi?")) {
+    sessionStorage.clear();
+    window.location.href = 'admin.html';
+  }
+}
+
+// Init
+updateStats();
+</script>
+</body>
+</html>

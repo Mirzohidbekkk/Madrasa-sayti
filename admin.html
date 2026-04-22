@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Virtual Hanafiy Madrasasi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --dark:       #050e08;
+      --dark2:      #071a0f;
+      --gold:       #c8973f;
+      --gold-light: #e8c97a;
+      --green:      #1a4a2a;
+      --border:     rgba(200,151,63,0.3);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .bg-pattern {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.06)' stroke-width='0.5'%3E%3Cpolygon points='40,5 75,25 75,55 40,75 5,55 5,25'/%3E%3Cpolygon points='40,18 62,30 62,50 40,62 18,50 18,30'/%3E%3Cline x1='40' y1='5' x2='40' y2='18'/%3E%3Cline x1='75' y1='25' x2='62' y2='30'/%3E%3Cline x1='75' y1='55' x2='62' y2='50'/%3E%3Cline x1='40' y1='75' x2='40' y2='62'/%3E%3Cline x1='5' y1='55' x2='18' y2='50'/%3E%3Cline x1='5' y1='25' x2='18' y2='30'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .glow-1 {
+      position: absolute; width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(200,151,63,0.08) 0%, transparent 70%);
+      top: -100px; left: -100px; pointer-events: none;
+    }
+    .glow-2 {
+      position: absolute; width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(26,74,42,0.15) 0%, transparent 70%);
+      bottom: -80px; right: -80px; pointer-events: none;
+    }
+
+    .login-wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px;
+      padding: 20px;
+    }
+
+    .login-box {
+      border: 1px solid var(--border);
+      background: rgba(7,26,15,0.9);
+      padding: 50px 40px;
+      position: relative;
+    }
+    /* Corner ornaments */
+    .login-box::before, .login-box::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .login-box::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
+    .login-box::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+
+    .login-top { text-align: center; margin-bottom: 35px; }
+    .login-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 30px; color: var(--gold);
+      text-shadow: 0 0 20px rgba(200,151,63,0.4);
+      margin-bottom: 8px;
+    }
+    .login-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px; letter-spacing: 3px;
+      color: var(--gold-light); opacity: 0.8;
+      text-transform: uppercase;
+    }
+    .login-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 25px 0;
+    }
+
+    .tab-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 28px;
+    }
+    .tab-btn {
+      padding: 9px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--gold-light);
+      font-family: 'Cinzel', serif;
+      font-size: 10px; letter-spacing: 2px;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .tab-btn.active {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    .form-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: 10px; letter-spacing: 2px;
+      color: var(--gold); text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      background: rgba(5,14,8,0.8);
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      padding: 12px 16px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input:focus { border-color: var(--gold); }
+    input::placeholder { color: rgba(200,151,63,0.3); }
+
+    .google-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      padding: 13px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px; letter-spacing: 2px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.3s;
+      margin-bottom: 12px;
+    }
+    .google-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .google-btn i { font-size: 15px; color: #EA4335; }
+
+    .login-btn {
+      width: 100%;
+      background: var(--gold);
+      border: none;
+      color: var(--dark);
+      padding: 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 12px; letter-spacing: 3px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 8px;
+    }
+    .login-btn:hover { background: var(--gold-light); }
+
+    .error-msg {
+      background: rgba(220,50,50,0.15);
+      border: 1px solid rgba(220,50,50,0.4);
+      color: #ff9999;
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .back-link {
+      text-align: center; margin-top: 25px;
+    }
+    .back-link a {
+      color: var(--gold); opacity: 0.5;
+      text-decoration: none;
+      font-size: 11px; letter-spacing: 1px;
+      font-family: 'Cinzel', serif;
+      transition: opacity 0.3s;
+    }
+    .back-link a:hover { opacity: 1; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Google auth loading */
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; display: none;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-top">
+      <div class="login-arabic">لوحة الإدارة</div>
+      <div class="login-title">Admin Panel</div>
+    </div>
+    <div class="login-divider"></div>
+
+    <!-- Tab buttons -->
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('password')">
+        <i class="fas fa-key" style="margin-right:5px;font-size:9px;"></i>PAROL
+      </button>
+      <button class="tab-btn" onclick="switchTab('google')">
+        <i class="fab fa-google" style="margin-right:5px;font-size:9px;"></i>GOOGLE
+      </button>
+    </div>
+
+    <!-- Password tab -->
+    <div class="tab-panel active" id="panel-password">
+      <div class="error-msg" id="errorMsg">
+        <i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>Login yoki parol noto'g'ri
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-user" style="margin-right:5px;"></i>Login</label>
+        <input type="text" id="inputLogin" placeholder="Admin login" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-lock" style="margin-right:5px;"></i>Parol</label>
+        <input type="password" id="inputPassword" placeholder="••••••••" autocomplete="current-password"
+               onkeypress="if(event.key==='Enter') loginWithPassword()">
+      </div>
+      <button class="login-btn" onclick="loginWithPassword()">
+        <i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>KIRISH
+      </button>
+    </div>
+
+    <!-- Google tab -->
+    <div class="tab-panel" id="panel-google">
+      <p style="text-align:center; font-size:12px; color:rgba(240,230,204,0.6); margin-bottom:24px; line-height:1.7;">
+        Google akkauntingiz bilan kirish uchun quyidagi tugmani bosing
+      </p>
+      <button class="google-btn" onclick="loginWithGoogle()">
+        <i class="fab fa-google"></i>
+        GOOGLE BILAN KIRISH
+      </button>
+      <p style="text-align:center; font-size:11px; color:rgba(200,151,63,0.4); margin-top:12px;">
+        Faqat ruxsat etilgan Gmail manzillar kirishi mumkin
+      </p>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← Asosiy sahifaga qaytish</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// KONFIGURATSIYA — BU YERDA O'ZGARTIRING
+// ═══════════════════════════════════════════════════
+const ADMIN_CONFIG = {
+  // Parol bilan kirish
+  LOGIN:    'admin',
+  PASSWORD: 'madrasa2026',
+
+  // Google bilan kirish — ruxsat etilgan Gmail manzillar
+  ALLOWED_EMAILS: [
+    'youremail@gmail.com',  // <-- o'zingizning Gmail manzilingiz
+  ],
+
+  // Google OAuth Client ID (Google Cloud Console'dan oling)
+  GOOGLE_CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+};
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && tab==='password') || (i===1 && tab==='google'));
+  });
+  document.getElementById('panel-password').classList.toggle('active', tab==='password');
+  document.getElementById('panel-google').classList.toggle('active', tab==='google');
+}
+
+function loginWithPassword() {
+  const login = document.getElementById('inputLogin').value.trim();
+  const pass  = document.getElementById('inputPassword').value;
+  const err   = document.getElementById('errorMsg');
+
+  if (login === ADMIN_CONFIG.LOGIN && pass === ADMIN_CONFIG.PASSWORD) {
+    err.classList.remove('show');
+    sessionStorage.setItem('adminAuth', 'password');
+    sessionStorage.setItem('adminLogin', login);
+    window.location.href = 'dashboard.html';
+  } else {
+    err.classList.add('show');
+    document.getElementById('inputPassword').value = '';
+  }
+}
+
+function loginWithGoogle() {
+  // Google OAuth 2.0 Implicit Flow
+  const params = new URLSearchParams({
+    client_id:     ADMIN_CONFIG.GOOGLE_CLIENT_ID,
+    redirect_uri:  window.location.origin + '/admin.html',
+    response_type: 'token',
+    scope:         'email profile',
+    state:         'google_login',
+  });
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+// Google OAuth callback
+async function handleGoogleCallback(accessToken) {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const r = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+    const user = await r.json();
+    if (ADMIN_CONFIG.ALLOWED_EMAILS.includes(user.email)) {
+      sessionStorage.setItem('adminAuth', 'google');
+      sessionStorage.setItem('adminEmail', user.email);
+      sessionStorage.setItem('adminName', user.name);
+      window.location.href = 'dashboard.html';
+    } else {
+      alert(`Kechirasiz, "${user.email}" manziliga ruxsat berilmagan.`);
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+  } catch(e) {
+    alert('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+// URL hash'dan access_token olish
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
+  const state = params.get('state');
+  if (token && state === 'google_login') {
+    handleGoogleCallback(token);
+  }
+
+  // Agar allaqachon kirgan bo'lsa
+  if (sessionStorage.getItem('adminAuth')) {
+    window.location.href = 'dashboard.html';
+  }
+});
+</script>
+</body>
+</html>

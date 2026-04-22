@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Hanafiy Madrasasi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;600;700&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --dark:       #050e08;
+      --dark2:      #071a0f;
+      --dark3:      #0a2416;
+      --gold:       #c8973f;
+      --gold-light: #e8c97a;
+      --gold-pale:  #f5e6b8;
+      --green:      #1a4a2a;
+      --green2:     #0d3320;
+      --cream:      #faf6ed;
+      --cream2:     #f0e8d0;
+      --text-light: #f0e6cc;
+      --border:     rgba(200,151,63,0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--dark);
+      color: var(--gold-light);
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════
+       ARABIK GEOMETRIC PATTERN BACKGROUND
+    ═══════════════════════════════════ */
+    .pattern-bg {
+      background-image:
+        radial-gradient(circle at 25% 25%, rgba(200,151,63,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(200,151,63,0.04) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.07)' stroke-width='0.5'%3E%3Cpolygon points='40,5 75,25 75,55 40,75 5,55 5,25'/%3E%3Cpolygon points='40,18 62,30 62,50 40,62 18,50 18,30'/%3E%3Cline x1='40' y1='5' x2='40' y2='18'/%3E%3Cline x1='75' y1='25' x2='62' y2='30'/%3E%3Cline x1='75' y1='55' x2='62' y2='50'/%3E%3Cline x1='40' y1='75' x2='40' y2='62'/%3E%3Cline x1='5' y1='55' x2='18' y2='50'/%3E%3Cline x1='5' y1='25' x2='18' y2='30'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* ═══════════════════════════════════
+       BISMILLAH KIRISH EKRANI
+    ═══════════════════════════════════ */
+    #bismillah-screen {
+      position: fixed; inset: 0;
+      background: var(--dark);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      z-index: 10000;
+      transition: opacity 1.5s ease;
+    }
+    #bismillah-screen .star-pattern {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='rgba(200,151,63,0.05)'%3E%3Cpolygon points='30,2 36,20 55,20 40,32 46,50 30,38 14,50 20,32 5,20 24,20'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .bismillah-inner {
+      position: relative; text-align: center; animation: fadeInScale 1s ease forwards;
+    }
+    .bismillah-arabic {
+      font-family: 'Amiri', serif;
+      font-size: clamp(36px, 8vw, 72px);
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(200,151,63,0.6);
+      line-height: 1.4;
+    }
+    .bismillah-ornament {
+      font-size: 28px; color: var(--gold); opacity: 0.7; margin: 10px 0;
+      letter-spacing: 20px;
+    }
+    @keyframes fadeInScale {
+      from { opacity:0; transform: scale(0.85); }
+      to   { opacity:1; transform: scale(1); }
+    }
+
+    /* ═══════════════════════════════════
+       NAMOZ VAQTLARI STRIPLARI
+    ═══════════════════════════════════ */
+    .namoz-strip {
+      background: linear-gradient(90deg, var(--dark2), var(--green2), var(--dark2));
+      border-bottom: 1px solid var(--gold);
+      border-top: 1px solid var(--gold);
+      padding: 9px 0;
+      font-size: 13px; font-weight: 500;
+      color: var(--gold-light);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .namoz-strip-inner {
+      display: inline-block;
+      animation: marqueeScroll 40s linear infinite;
+      padding-left: 100%;
+    }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-100%); }
+    }
+    .namoz-item { display: inline-block; margin: 0 30px; }
+    .namoz-item span { color: var(--gold); font-weight: 700; }
+
+    /* ═══════════════════════════════════
+       HEADER
+    ═══════════════════════════════════ */
+    header {
+      position: relative;
+      padding: clamp(60px, 10vh, 110px) 20px clamp(50px, 8vh, 90px);
+      text-align: center;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(rgba(5,14,8,0.88), rgba(5,14,8,0.88)),
+        url('https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=1600') center/cover;
+    }
+    .header-pattern {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.06)' stroke-width='0.7'%3E%3Cpath d='M50 5 L95 27.5 L95 72.5 L50 95 L5 72.5 L5 27.5 Z'/%3E%3Cpath d='M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z'/%3E%3Ccircle cx='50' cy='50' r='15'/%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    header .content { position: relative; z-index: 1; }
+
+    .header-badge {
+      display: inline-block;
+      border: 1px solid var(--border);
+      padding: 5px 20px;
+      font-size: 10px; letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      font-family: 'Cinzel', serif;
+    }
+
+    .header-arabic {
+      font-family: 'Amiri', serif;
+      font-size: clamp(22px, 5vw, 38px);
+      color: var(--gold-light);
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(200,151,63,0.3);
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(24px, 5.5vw, 54px);
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(200,151,63,0.4);
+      margin: 8px 0 14px;
+    }
+
+    .header-divider {
+      display: flex; align-items: center; justify-content: center;
+      gap: 15px; margin: 15px auto;
+    }
+    .header-divider::before, .header-divider::after {
+      content: '';
+      width: 80px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .header-divider::after { background: linear-gradient(90deg, var(--gold), transparent); }
+
+    header p {
+      font-size: 13px; letter-spacing: 3px;
+      opacity: 0.75; color: var(--text-light);
+      text-transform: uppercase;
+    }
+
+    /* CORNER ORNAMENTS */
+    .corner-ornament {
+      position: absolute; width: 60px; height: 60px;
+      border-color: rgba(200,151,63,0.4);
+      border-style: solid; border-width: 0;
+    }
+    .co-tl { top: 15px; left: 15px; border-top-width: 2px; border-left-width: 2px; }
+    .co-tr { top: 15px; right: 15px; border-top-width: 2px; border-right-width: 2px; }
+    .co-bl { bottom: 15px; left: 15px; border-bottom-width: 2px; border-left-width: 2px; }
+    .co-br { bottom: 15px; right: 15px; border-bottom-width: 2px; border-right-width: 2px; }
+
+    .btn-admin {
+      position: absolute; top: 18px; right: 18px; z-index: 10;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 7px 18px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px; letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-admin:hover { background: var(--gold); color: var(--dark); }
+
+    /* ═══════════════════════════════════
+       TOP SECTION — SLIDER + HIKMAT
+    ═══════════════════════════════════ */
+    .top-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 36px 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* SLIDER */
+    .slider-box {
+      position: relative;
+      min-height: 400px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--dark2);
+    }
+    .slider-box::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.05)' stroke-width='0.5'%3E%3Cpolygon points='30,3 57,18 57,42 30,57 3,42 3,18'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .slider-track {
+      display: flex;
+      transition: transform 0.7s cubic-bezier(0.77,0,0.18,1);
+      height: 100%; min-height: 400px;
+    }
+    .slide {
+      min-width: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 30px; text-align: center;
+      position: relative;
+    }
+    .slide-icon {
+      width: 90px; height: 90px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 25px;
+      font-size: 36px; color: var(--gold);
+      position: relative;
+    }
+    .slide-icon::before, .slide-icon::after {
+      content: '';
+      position: absolute;
+      border: 1px solid rgba(200,151,63,0.3);
+      border-radius: 50%;
+    }
+    .slide-icon::before { inset: -8px; }
+    .slide-icon::after  { inset: -16px; }
+    .slide h2 {
+      font-family: 'Amiri', serif;
+      font-size: clamp(22px, 4vw, 30px);
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .slide p { color: var(--text-light); font-size: 15px; line-height: 1.7; max-width: 320px; }
+    .slider-dots {
+      position: absolute; bottom: 18px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 8px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border: 1px solid var(--gold);
+      cursor: pointer; transition: 0.3s;
+    }
+    .dot.active { background: var(--gold); }
+
+    /* HIKMAT CARD */
+    .hikmat-card {
+      position: relative;
+      min-height: 400px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hikmat-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: opacity 1s ease;
+    }
+    .hikmat-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(5,14,8,0.92), rgba(10,36,22,0.85));
+    }
+    .hikmat-content {
+      position: relative; z-index: 2;
+      padding: 40px 30px; text-align: center;
+    }
+    .hikmat-label {
+      font-size: 9px; letter-spacing: 4px;
+      color: var(--gold); text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      margin-bottom: 20px; display: block;
+    }
+    .hikmat-ornament { font-size: 22px; color: var(--gold); opacity: 0.5; margin-bottom: 15px; }
+    .hikmat-arabic {
+      font-family: 'Amiri', serif;
+      font-size: clamp(22px, 4vw, 32px);
+      color: var(--gold-light);
+      line-height: 1.6;
+      margin-bottom: 18px;
+      direction: rtl;
+    }
+    .hikmat-trans {
+      font-style: italic; font-size: 14px;
+      color: var(--text-light); line-height: 1.7;
+      margin-bottom: 15px;
+    }
+    .hikmat-source {
+      display: inline-block;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--gold); text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+    }
+
+    /* ═══════════════════════════════════
+       BO'LIMLAR SECTION
+    ═══════════════════════════════════ */
+    .bolimlar-section {
+      background: var(--cream);
+      padding: 70px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bolimlar-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.08)' stroke-width='0.6'%3E%3Cpolygon points='40,5 75,25 75,55 40,75 5,55 5,25'/%3E%3Cpolygon points='40,18 62,30 62,50 40,62 18,50 18,30'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .section-head { text-align: center; margin-bottom: 50px; position: relative; }
+    .section-sup {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--gold); font-family: 'Cinzel', serif;
+      display: block; margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Amiri', serif;
+      font-size: clamp(32px, 5vw, 50px);
+      color: var(--dark); line-height: 1.2;
+    }
+    .section-ornament {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-top: 12px;
+    }
+    .section-ornament::before, .section-ornament::after {
+      content: '';
+      width: 60px; height: 1px;
+      background: var(--gold);
+    }
+    .section-ornament span { color: var(--gold); font-size: 18px; }
+
+    .lessons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1300px; margin: 0 auto;
+      position: relative;
+    }
+
+    .lesson-card {
+      background: #fff;
+      border: 1px solid #edddb8;
+      border-bottom: 3px solid var(--gold);
+      padding: 35px 24px 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+    .lesson-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 0;
+      background: linear-gradient(135deg, var(--dark2), var(--green));
+      transition: height 0.35s ease;
+    }
+    .lesson-card:hover::before { height: 100%; }
+    .lesson-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
+
+    .card-inner { position: relative; z-index: 1; }
+
+    .card-icon-wrap {
+      width: 72px; height: 72px;
+      border: 1px solid #ddd;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+      transition: all 0.35s;
+    }
+    .lesson-card:hover .card-icon-wrap {
+      border-color: var(--gold);
+      background: rgba(200,151,63,0.15);
+    }
+    .card-icon-wrap i { font-size: 28px; color: var(--dark); transition: color 0.35s; }
+    .lesson-card:hover .card-icon-wrap i { color: var(--gold-light); }
+
+    .lesson-card h3 {
+      font-family: 'Amiri', serif;
+      font-size: 20px; color: var(--dark);
+      margin-bottom: 8px; transition: color 0.35s;
+    }
+    .lesson-card:hover h3 { color: var(--gold); }
+    .lesson-card p { font-size: 13px; color: #666; line-height: 1.6; transition: color 0.35s; }
+    .lesson-card:hover p { color: rgba(240,230,204,0.75); }
+
+    .card-arrow {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--gold); margin-top: 14px;
+      font-family: 'Cinzel', serif;
+      opacity: 0; transform: translateY(5px);
+      transition: all 0.35s;
+    }
+    .lesson-card:hover .card-arrow { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════ */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid var(--border);
+      padding: 50px 24px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    footer::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='rgba(200,151,63,0.04)' stroke-width='0.6'%3E%3Cpolygon points='40,5 75,25 75,55 40,75 5,55 5,25'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .footer-inner { position: relative; z-index: 1; }
+    .footer-logo {
+      text-align: center;
+      font-family: 'Amiri', serif;
+      font-size: 28px; color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .footer-sub {
+      text-align: center;
+      font-size: 10px; letter-spacing: 4px;
+      color: var(--gold); opacity: 0.6;
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      margin-bottom: 30px;
+    }
+    .footer-divider {
+      width: 200px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px auto;
+    }
+
+    .social-grid {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 12px;
+      margin-bottom: 30px;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 20px;
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      text-decoration: none;
+      font-size: 12px; letter-spacing: 1px;
+      transition: all 0.3s;
+      font-family: 'Cinzel', serif;
+    }
+    .social-link:hover {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+    .social-link i { font-size: 15px; }
+
+    .footer-copy {
+      text-align: center;
+      font-size: 11px; opacity: 0.4;
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    /* FLOATING BOT */
+    .floating-bot {
+      position: fixed; bottom: 24px; left: 24px;
+      background: #0088cc;
+      color: white;
+      padding: 11px 20px;
+      border-radius: 2px;
+      text-decoration: none;
+      font-weight: 600; font-size: 12px;
+      letter-spacing: 1px;
+      z-index: 999;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 6px 20px rgba(0,136,204,0.4);
+      transition: all 0.3s;
+      font-family: 'Cinzel', serif;
+    }
+    .floating-bot:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,136,204,0.5); }
+
+    /* SCROLL ANIMATIONS */
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 600px) {
+      .top-section { padding: 20px 14px; gap: 16px; }
+      .bolimlar-section { padding: 50px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BISMILLAH SCREEN -->
+<div id="bismillah-screen">
+  <div class="star-pattern"></div>
+  <div class="bismillah-inner">
+    <div class="bismillah-ornament">✦ ✦ ✦</div>
+    <div class="bismillah-arabic">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+    <div class="bismillah-ornament" style="margin-top:12px">✦ ✦ ✦</div>
+  </div>
+</div>
+
+<!-- NAMOZ VAQTLARI -->
+<div class="namoz-strip">
+  <div class="namoz-strip-inner" id="namoz-inner">
+    Yuklanmoqda...
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-pattern"></div>
+  <div class="corner-ornament co-tl"></div>
+  <div class="corner-ornament co-tr"></div>
+  <div class="corner-ornament co-bl"></div>
+  <div class="corner-ornament co-br"></div>
+  <button class="btn-admin" onclick="window.location.href='admin.html'">
+    <i class="fas fa-lock" style="font-size:9px; margin-right:5px;"></i>KIRISH
+  </button>
+  <div class="content">
+    <div class="header-badge">Onlayn Ta'lim Platformasi</div>
+    <div class="header-arabic">المدرسة الحنفية الافتراضية</div>
+    <h1>VIRTUAL HANAFIY MADRASASI</h1>
+    <div class="header-divider"></div>
+    <p>Ilm — Amal — Taqvo</p>
+  </div>
+</header>
+
+<!-- SLIDER + HIKMAT -->
+<div class="top-section pattern-bg">
+
+  <!-- Slider -->
+  <div class="slider-box reveal">
+    <div class="slider-track" id="sliderTrack">
+      <!-- Slides JS tomonidan yuklanadi -->
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+  </div>
+
+  <!-- Hikmat -->
+  <div class="hikmat-card reveal">
+    <div class="hikmat-bg" id="hikmatBg"></div>
+    <div class="hikmat-overlay"></div>
+    <div class="hikmat-content" id="hikmatContent">
+    </div>
+  </div>
+
+</div>
+
+<!-- BO'LIMLAR -->
+<div class="bolimlar-section">
+  <div class="section-head reveal">
+    <span class="section-sup">Ta'lim Yo'nalishlari</span>
+    <div class="section-title">ILM BO'LIMLARI</div>
+    <div class="section-ornament"><span>✦</span></div>
+  </div>
+  <div class="lessons-grid" id="lessonsGrid">
+    <!-- Kartochkalar JS tomonidan yoki Sheets'dan yuklanadi -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">المدرسة الحنفية</div>
+    <div class="footer-sub">Virtual Hanafiy Madrasasi</div>
+    <div class="footer-divider"></div>
+    <div class="social-grid" id="socialGrid">
+      <!-- Ijtimoiy tarmoqlar Sheets'dan yuklanadi -->
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-copy">© 2026 Virtual Hanafiy Madrasasi — Barcha huquqlar himoyalangan</div>
+  </div>
+</footer>
+
+<a href="https://t.me/YOUR_BOT" target="_blank" class="floating-bot" id="telegramBot">
+  <i class="fab fa-telegram"></i> TELEGRAM BOT
+</a>
+
+<script>
+// ═══════════════════════════════════════════════════
+// KONFIGURATSIYA — GOOGLE SHEETS API
+// ═══════════════════════════════════════════════════
+const CONFIG = {
+  SHEET_ID: 'YOUR_GOOGLE_SHEET_ID',
+  API_KEY:  'YOUR_GOOGLE_API_KEY',
+  // Sheet varaqlari nomlari
+  SHEETS: {
+    slider:   'Slider',
+    hikmat:   'Hikmatlar',
+    bolimlar: 'Bolimlar',
+    social:   'Ijtimoiy',
+    settings: 'Sozlamalar',
+  }
+};
+
+// Google Sheets'dan ma'lumot olish
+async function fetchSheet(sheetName) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${sheetName}?key=${CONFIG.API_KEY}`;
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!d.values || d.values.length < 2) return [];
+    const headers = d.values[0];
+    return d.values.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = row[i] || '');
+      return obj;
+    });
+  } catch(e) {
+    console.warn(`Sheet "${sheetName}" yuklanmadi, default ma'lumot ishlatiladi.`);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// DEFAULT MA'LUMOTLAR (Sheets ulangunga qadar ishlaydi)
+// ═══════════════════════════════════════════════════
+const DEFAULT_SLIDES = [
+  { icon: 'fas fa-book-open',     title: "Qur'on Ta'limi",  text: "Tajvid qoidalarini eng oson uslubda o'rganing va Allohning so'zlarini to'g'ri o'qishni o'zlashtirib oling." },
+  { icon: 'fas fa-mosque',        title: 'Amaliy Fiqh',     text: "Ibodu-toatga oid zaruriy shariat hukmlarini Hanafiy mazhabi asosida o'rganing." },
+  { icon: 'fas fa-pen-fancy',     title: 'Arab Tili',       text: "Nahu va sarf ilmlari orqali Qur'on tilini tushunish uchun mustahkam poydevor qo'ying." },
+  { icon: 'fas fa-star-and-crescent', title: "Aqoid",       text: "Moturidiya ta'limoti asosida to'g'ri islomiy e'tiqodning asoslarini o'rganing." },
+];
+
+const DEFAULT_HIKMAT = [
+  {
+    arabic: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+    uzbek: "«Sizlarning yaxshilaringiz Qur'onni o'rganib, uni boshqalarga ham o'rgatganlaringizdir.»",
+    manba: "Imom Buxoriy",
+    img: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=1200"
+  },
+  {
+    arabic: "طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ",
+    uzbek: "«Ilm talab qilish har bir musulmon uchun farzdir.»",
+    manba: "Ibn Moja",
+    img: "https://images.unsplash.com/photo-1584551271111-70bb96ee1717?q=80&w=1200"
+  },
+  {
+    arabic: "مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ",
+    uzbek: "«Kim ilm izlab yo'lga chiqsa, Alloh unga jannat yo'lini osonlashtiradi.»",
+    manba: "Imom Muslim",
+    img: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=1200"
+  }
+];
+
+const DEFAULT_BOLIMLAR = [
+  { icon:'fas fa-book-quran',      nomi:'Muallim Soniy',  tavsif:"Arab alifbosini noldan, tajvid qoidalari bilan o'rganing.",        link:'bolimlar/muallim-soniy.html' },
+  { icon:'fas fa-pen-fancy',       nomi:'Grammatika',     tavsif:"Nahu va Sarf ilmlari orqali arab tili qoidalarini o'zlashtiring.",  link:'bolimlar/grammatika.html' },
+  { icon:'fas fa-mosque',          nomi:'Fiqh',           tavsif:"Hanafiy mazhabi asosida kundalik ibodat hukmlarini o'rganing.",     link:'bolimlar/fiqh.html' },
+  { icon:'fas fa-star-and-crescent',nomi:'Aqoid',         tavsif:"Moturidiya ta'limoti asosida islomiy e'tiqod darslari.",           link:'bolimlar/aqoid.html' },
+  { icon:'fas fa-scroll',          nomi:'Tafsir',         tavsif:"Qur'oni Karim oyatlarining mazmuni va hikmatlari.",                 link:'bolimlar/tafsir.html' },
+  { icon:'fas fa-feather-pointed', nomi:'Hadis',          tavsif:"Rasululloh (s.a.v)ning muborak hadislari va sharhlari.",           link:'bolimlar/hadis.html' },
+  { icon:'fas fa-building-columns',nomi:'Kutubxona',      tavsif:"Saralangan ishonchli islomiy manbalar to'plami.",                  link:'bolimlar/kutubxona.html' },
+  { icon:'fas fa-graduation-cap', nomi:'Imtihon',         tavsif:"Bilimlarni sinovdan o'tkazish va natijalarni tekshirish.",         link:'bolimlar/imtihon.html' },
+];
+
+const DEFAULT_SOCIAL = [
+  { nomi:'Telegram',  icon:'fab fa-telegram',  link:'https://t.me/your_channel' },
+  { nomi:'Instagram', icon:'fab fa-instagram', link:'https://instagram.com/your_page' },
+  { nomi:'YouTube',   icon:'fab fa-youtube',   link:'https://youtube.com/@your_channel' },
+];
+
+// ═══════════════════════════════════════════════════
+// RENDER FUNKSIYALARI
+// ═══════════════════════════════════════════════════
+function renderSlider(slides) {
+  const track = document.getElementById('sliderTrack');
+  const dots  = document.getElementById('sliderDots');
+  if (!track) return;
+
+  track.innerHTML = slides.map(s => `
+    <div class="slide">
+      <div class="slide-icon"><i class="${s.icon}"></i></div>
+      <h2>${s.title || s.nomi || ''}</h2>
+      <p>${s.text || s.tavsif || ''}</p>
+    </div>
+  `).join('');
+
+  dots.innerHTML = slides.map((_, i) =>
+    `<div class="dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`
+  ).join('');
+}
+
+let curSlide = 0, sliderTotal = 0, sliderTimer;
+function goSlide(n) {
+  curSlide = (n + sliderTotal) % sliderTotal;
+  const track = document.getElementById('sliderTrack');
+  if (track) track.style.transform = `translateX(-${curSlide*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===curSlide));
+}
+function autoSlide() {
+  sliderTimer = setInterval(() => goSlide(curSlide+1), 5000);
+}
+
+// ───────────────────────────────────────────────────
+let hikmatList = [], hikmatIdx = 0, hikmatTimer;
+
+function renderHikmat(h) {
+  const bg = document.getElementById('hikmatBg');
+  const ct = document.getElementById('hikmatContent');
+  if (!bg || !ct) return;
+  bg.style.backgroundImage = `url('${h.img}')`;
+  ct.style.opacity = 0;
+  setTimeout(() => {
+    ct.innerHTML = `
+      <span class="hikmat-label">✦ Hadis va Hikmatlar ✦</span>
+      <div class="hikmat-ornament">❝</div>
+      <div class="hikmat-arabic">${h.arabic}</div>
+      <div class="hikmat-trans">${h.uzbek}</div>
+      <div class="hikmat-source">${h.manba}</div>
+    `;
+    ct.style.transition = 'opacity 0.8s'; ct.style.opacity = 1;
+  }, 300);
+}
+function autoHikmat(list) {
+  hikmatList = list;
+  renderHikmat(list[0]);
+  hikmatTimer = setInterval(() => {
+    hikmatIdx = (hikmatIdx+1) % list.length;
+    renderHikmat(list[hikmatIdx]);
+  }, 9000);
+}
+
+// ───────────────────────────────────────────────────
+function renderBolimlar(list) {
+  const grid = document.getElementById('lessonsGrid');
+  if (!grid) return;
+  grid.innerHTML = list.map(b => `
+    <a class="lesson-card reveal" href="${b.link || b.sahifa || '#'}">
+      <div class="card-inner">
+        <div class="card-icon-wrap"><i class="${b.icon}"></i></div>
+        <h3>${b.nomi || b.title || ''}</h3>
+        <p>${b.tavsif || b.text || ''}</p>
+        <div class="card-arrow">BATAFSIL <i class="fas fa-arrow-right" style="font-size:9px"></i></div>
+      </div>
+    </a>
+  `).join('');
+  observeReveal();
+}
+
+function renderSocial(list) {
+  const grid = document.getElementById('socialGrid');
+  if (!grid) return;
+  grid.innerHTML = list.map(s => `
+    <a class="social-link" href="${s.link}" target="_blank" rel="noopener">
+      <i class="${s.icon}"></i> ${s.nomi}
+    </a>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// NAMOZ VAQTLARI
+// ═══════════════════════════════════════════════════
+async function fetchNamoz() {
+  try {
+    const r = await fetch('https://islomapi.uz/api/present/day?region=Toshkent');
+    const d = await r.json();
+    const t = d.times;
+    const inner = document.getElementById('namoz-inner');
+    if (!inner) return;
+    const items = [
+      {n:'Bomdod',   v:t.tong_saharlik},
+      {n:'Quyosh',   v:t.quyosh},
+      {n:'Peshin',   v:t.peshin},
+      {n:'Asr',      v:t.asr},
+      {n:'Shom',     v:t.shom_iftor},
+      {n:'Xufton',   v:t.hufton},
+    ];
+    const html = items.map(i=>`<span class="namoz-item">${i.n}: <span>${i.v}</span></span>`).join(' ✦ ');
+    inner.innerHTML = `✦ Bugungi namoz vaqtlari — Toshkent ✦ &nbsp;&nbsp;&nbsp; ${html} &nbsp;&nbsp;&nbsp; ✦ Virtual Hanafiy Madrasasiga xush kelibsiz ✦`;
+  } catch(e) {
+    const inner = document.getElementById('namoz-inner');
+    if (inner) inner.innerHTML = '✦ Virtual Hanafiy Madrasasiga xush kelibsiz ✦';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════════════════
+function observeReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e,i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i*80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+// ═══════════════════════════════════════════════════
+// ASOSIY YUKLASH
+// ═══════════════════════════════════════════════════
+async function init() {
+  // 1. Bismillah ekrani
+  const screen = document.getElementById('bismillah-screen');
+  try { new Audio('https://www.islamcan.com/audio/bismillah.mp3').play().catch(()=>{}); } catch(e){}
+  setTimeout(() => {
+    screen.style.opacity = '0';
+    setTimeout(() => screen.style.display = 'none', 1500);
+  }, 2800);
+
+  // 2. Namoz vaqtlari
+  fetchNamoz();
+
+  // 3. Slider ma'lumotlari
+  let slides = await fetchSheet(CONFIG.SHEETS.slider);
+  if (!slides || !slides.length) slides = DEFAULT_SLIDES;
+  sliderTotal = slides.length;
+  renderSlider(slides);
+  autoSlide();
+
+  // 4. Hikmatlar
+  let hikmat = await fetchSheet(CONFIG.SHEETS.hikmat);
+  if (!hikmat || !hikmat.length) hikmat = DEFAULT_HIKMAT;
+  autoHikmat(hikmat);
+
+  // 5. Bo'limlar
+  let bolimlar = await fetchSheet(CONFIG.SHEETS.bolimlar);
+  if (!bolimlar || !bolimlar.length) bolimlar = DEFAULT_BOLIMLAR;
+  renderBolimlar(bolimlar);
+
+  // 6. Ijtimoiy tarmoqlar
+  let social = await fetchSheet(CONFIG.SHEETS.social);
+  if (!social || !social.length) social = DEFAULT_SOCIAL;
+  renderSocial(social);
+
+  // 7. Telegram bot link
+  let settings = await fetchSheet(CONFIG.SHEETS.settings);
+  if (settings && settings.length) {
+    const botSetting = settings.find(s => s.kalit === 'telegram_bot');
+    if (botSetting && botSetting.qiymat) {
+      document.getElementById('telegramBot').href = botSetting.qiymat;
+    }
+  }
+
+  // 8. Reveal animations
+  observeReveal();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
